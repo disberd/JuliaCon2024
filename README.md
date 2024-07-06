@@ -1,0 +1,1 @@
+This repository contains code and examples for the JuliaCon2024 presentation on PlutoDevMacros and PlutoVSCodeDebugger
