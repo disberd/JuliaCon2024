@@ -1,6 +1,8 @@
 ### A Pluto.jl notebook ###
 # v0.19.43
 
+#> custom_attrs = ["hide-enabled"]
+
 using Markdown
 using InteractiveUtils
 
@@ -18,7 +20,7 @@ ExtendedTableOfContents()
 
 # ╔═╡ b74207fb-0901-4897-8f75-c842f93e01c7
 md"""
-# Introduction
+# 🎈 Pluto.jl – Interactive package development and debugging
 """
 
 # ╔═╡ 78c648d9-f2a3-48ec-851a-b58cb93a44aa
@@ -40,7 +42,15 @@ md"""
 """
 
 # ╔═╡ 4ba4ee89-e7e5-4f94-845e-99d29ffdff2d
+@fromparent import *
 
+# ╔═╡ eeea367f-df6c-4d32-8764-97eaf1d2439d
+struct LinearPhasedArray
+	N::Int
+end
+
+# ╔═╡ e4895912-285b-433d-b58e-92a326bc963b
+SimpleAntenna
 
 # ╔═╡ 720ea93f-c1d5-4243-980c-381e4eeca461
 md"""
@@ -76,7 +86,9 @@ end
 
 # ╔═╡ 92aac9a5-f926-455a-a9b8-ecaa287eec19
 @htl("""
+<div class='inner-hidden'>
 This cell creates the presentation button and handling toggling presentation/fullscreen
+</div>
 <script>
 	const { css } = await import("https://esm.sh/@emotion/css")
 	const myClass = css`
@@ -109,14 +121,14 @@ This cell creates the presentation button and handling toggling presentation/ful
 	
 	const arrow_listener = (e) => {
 		if (is_presenting() && e instanceof KeyboardEvent && e.target.closest('pluto-input') == null && e.target.closest('pluto-output') == null) {
-			if (e.key === "ArrowUp") {
+			if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
 				e.preventDefault()
-				document.querySelector('button.changeslide.prev').click()
-				return false
-			} else if (e.key === "ArrowDown") {
+				e.stopImmediatePropagation()
+				document.querySelector('button.changeslide.prev span').click()
+			} else if (e.key === "ArrowDown" || e.key === "ArrowRight") {
 				e.preventDefault()
-				document.querySelector('button.changeslide.next').click()
-				return false
+				e.stopImmediatePropagation()
+				document.querySelector('button.changeslide.next span').click()
 			}
 		}
 	}
@@ -136,7 +148,7 @@ This cell creates the presentation button and handling toggling presentation/ful
 		  	}
 		} else {
 			hide_enabled = notebook.hasAttribute('hide-enabled')
-			notebook.toggleAttribute('hide-enabled', false)
+			// notebook.toggleAttribute('hide-enabled', false)
 			if (!document.fullscreenElement) {
 			    document.documentElement.requestFullscreen();
 			}
@@ -169,6 +181,9 @@ This cell creates the presentation button and handling toggling presentation/ful
 	body.presentation nav.plutoui-toc {
 		display: none;
 	}
+	pluto-notebook[hide-enabled] .inner-hidden {
+		display: none;
+	}
 </style>
 """) |> show_output_when_hidden
 
@@ -186,7 +201,88 @@ This cell creates the presentation button and handling toggling presentation/ful
 # """
 
 # ╔═╡ 63fa6496-fe18-4ec4-9f4a-5d6602ec094c
+md"""
+## Style
+"""
 
+# ╔═╡ b0c8b4cd-a0a0-4dfc-8851-0a4734e0460d
+presentation_zoom = 1.5
+
+# ╔═╡ a8e629fd-d1aa-4e47-81fa-db119ae82f15
+@htl("""
+<script>
+	// This is adapte from Pluto/frontend/components/SlideControls.js to make it work with zoom and hidden cells
+	const zoom = $presentation_zoom
+	const calculate_slide_positions = () => {
+        const notebook_node = document.querySelector("pluto-notebook")
+        if (!notebook_node) return []
+
+        const height = window.innerHeight
+        const headers = Array.from(notebook_node.querySelectorAll("pluto-output h1, pluto-output h2"))
+        const pos = headers.map((el) => el.getBoundingClientRect()).filter((rect) => rect.height > 0) // We filter cells without height as they are hidden
+		// We multiply edges by the zoom
+        const edges = pos.map((rect) => rect.top * zoom + window.scrollY)
+
+        edges.push(notebook_node.getBoundingClientRect().bottom * zoom + window.scrollY)
+
+        const scrollPositions = headers.map((el, i) => {
+            if (el.tagName == "H1") {
+                // center vertically
+                const slideHeight = (edges[i + 1] - edges[i])/zoom - height
+                return edges[i] - Math.max(0, (height - slideHeight) / 2)
+            } else {
+                // align to top
+                return edges[i] - 20
+            }
+        })
+
+        return scrollPositions
+    }
+    window.calculate_slide_positions = calculate_slide_positions
+
+    const go_previous_slide = (e) => {
+		e.preventDefault()
+		e.stopImmediatePropagation()
+		console.log('custom previous slide')
+        const positions = calculate_slide_positions(e)
+
+        const pos = positions.reverse().find((y) => y < window.scrollY - 10)
+
+        if (pos) window.scrollTo(window.scrollX, pos)
+    }
+
+    const go_next_slide = (e) => {
+		e.preventDefault()
+		e.stopImmediatePropagation()
+		console.log('custom next slide')
+        const positions = calculate_slide_positions(e)
+        const pos = positions.find((y) => y - 10 > window.scrollY)
+        if (pos) window.scrollTo(window.scrollX, pos)
+    }
+
+	document.querySelector('button.changeslide.next span').onclick = go_next_slide
+	document.querySelector('button.changeslide.prev span').onclick = go_previous_slide
+
+	invalidation.then(() => {
+		document.querySelector('button.changeslide.next span').onclick = null
+		document.querySelector('button.changeslide.prev span').onclick = null
+	})
+</script>
+""")
+
+# ╔═╡ 89920d7f-dc57-4ab9-89f7-a12c346c1d6c
+@htl("""
+Cell defining the default style inside presentation mode 
+<style>
+	body.presentation pluto-editor.fullscreen main {
+		margin-right: 0px;
+		align-self: center;
+	}
+	body.presentation pluto-editor.fullscreen {
+		zoom: $presentation_zoom;
+	}
+</style>
+""")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -520,6 +616,8 @@ version = "17.4.0+2"
 # ╟─80876756-b4f3-48bf-894d-1669bf1dcbaa
 # ╟─6200d8c1-5f84-47bd-b859-143fac60cd16
 # ╠═4ba4ee89-e7e5-4f94-845e-99d29ffdff2d
+# ╠═eeea367f-df6c-4d32-8764-97eaf1d2439d
+# ╠═e4895912-285b-433d-b58e-92a326bc963b
 # ╟─720ea93f-c1d5-4243-980c-381e4eeca461
 # ╟─2b685321-4105-4ca6-9604-d9858c296318
 # ╟─41e6fb64-27a0-4054-ac56-6837d835aaf0
@@ -527,8 +625,11 @@ version = "17.4.0+2"
 # ╠═6fce800f-f375-414e-abee-ee02baf582a2
 # ╟─ae721a0d-2bc4-49e8-bd91-25f108873b33
 # ╟─ecb1d74f-dae1-4a76-a20a-0760fb772d7a
-# ╟─92aac9a5-f926-455a-a9b8-ecaa287eec19
+# ╠═92aac9a5-f926-455a-a9b8-ecaa287eec19
+# ╠═a8e629fd-d1aa-4e47-81fa-db119ae82f15
 # ╠═8a174275-47b5-4280-b0ab-c490a1b51bd2
-# ╠═63fa6496-fe18-4ec4-9f4a-5d6602ec094c
+# ╟─63fa6496-fe18-4ec4-9f4a-5d6602ec094c
+# ╠═b0c8b4cd-a0a0-4dfc-8851-0a4734e0460d
+# ╠═89920d7f-dc57-4ab9-89f7-a12c346c1d6c
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
