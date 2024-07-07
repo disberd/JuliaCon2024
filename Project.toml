@@ -1,0 +1,4 @@
+name = "SimpleAntenna"
+uuid = "12f6ff01-21d5-4512-8b74-a3d953f35cb6"
+authors = ["Alberto Mengali <disberd@gmail.com>"]
+version = "0.1.0"
