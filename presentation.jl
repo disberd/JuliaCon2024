@@ -1,8 +1,6 @@
 ### A Pluto.jl notebook ###
 # v0.19.43
 
-#> custom_attrs = ["hide-enabled"]
-
 using Markdown
 using InteractiveUtils
 
@@ -23,18 +21,18 @@ md"""
 # 🎈 Pluto.jl – Interactive package development and debugging
 """
 
-# ╔═╡ 78c648d9-f2a3-48ec-851a-b58cb93a44aa
+# ╔═╡ 361f7679-127e-4bb3-a12e-5868785fc4f1
 md"""
-## Table of Contents
+## About Me
 """
 
-# ╔═╡ 80876756-b4f3-48bf-894d-1669bf1dcbaa
+# ╔═╡ 78c648d9-f2a3-48ec-851a-b58cb93a44aa
 md"""
-- Introduction
-- Example Usage in Pluto
-- PlutoVSCodeDebugger
-- PlutoDevMacros
+## Outline
 """
+
+# ╔═╡ 468613ad-54ee-494c-af7c-536f9101a845
+
 
 # ╔═╡ 6200d8c1-5f84-47bd-b859-143fac60cd16
 md"""
@@ -92,111 +90,6 @@ begin
 	html"""This cell just contains the base64 encoded image of the presentation presentation_icon, which was taken from <a href="https://www.flaticon.com/free-icons/presentation" title="presentation icons">Presentation icons created by Stockio - Flaticon</a>"""
 end
 
-# ╔═╡ a8e629fd-d1aa-4e47-81fa-db119ae82f15
-@htl("""
-<div class='inner-hidden'>
-This cell ovverides the behavior of scoll buttons to work with hidden cells and zoom level. This has only been tested in chromium and will probably not work in other browsers.
-</div>
-<script>
-	// This is adapte from Pluto/frontend/components/SlideControls.js to make it work with zoom and hidden cells
-	const calculate_slide_positions = () => {
-		const page_zoom = window.get_zoom()
-		let zoom = window.is_presenting() ? parseFloat(document.documentElement.style.getPropertyValue("--zoom-level")) : 1
-        const notebook_node = document.querySelector("pluto-notebook")
-        if (!notebook_node) return []
-
-        const height = window.innerHeight
-        const headers = Array.from(notebook_node.querySelectorAll("pluto-output h1, pluto-output h2")).filter((el) => el.getBoundingClientRect().height > 0) // We filter cells without height as they are hidden
-        const pos = headers.map((el) => el.getBoundingClientRect()) 
-		// We multiply edges by the zoom
-        const edges = pos.map((rect) => rect.top * zoom + window.scrollY)
-
-        edges.push(notebook_node.getBoundingClientRect().bottom * zoom + window.scrollY)
-		console.log(edges)
-
-        const scrollPositions = headers.map((el, i) => {
-            if (el.tagName == "H1") {
-                // center vertically
-                const headingHeight = pos[i].height / page_zoom
-                return edges[i] - Math.max(0, (height - headingHeight) / 2) + 10
-            } else {
-                // align to top
-                return edges[i] - 20
-            }
-        })
-
-        return scrollPositions
-    }
-    window.calculate_slide_positions = calculate_slide_positions
-
-    const go_previous_slide = (e) => {
-		e?.preventDefault()
-		e?.stopImmediatePropagation()
-		console.log('custom previous slide')
-        const positions = calculate_slide_positions(e)
-
-        const pos = positions.reverse().find((y) => y < window.scrollY - 10)
-
-        if (pos) window.scrollTo(window.scrollX, pos)
-    }
-
-    const go_next_slide = (e) => {
-		e?.preventDefault()
-		e?.stopImmediatePropagation()
-		console.log('custom next slide')
-        const positions = calculate_slide_positions(e)
-        const pos = positions.find((y) => y - 10 > window.scrollY)
-        if (pos) window.scrollTo(window.scrollX, pos)
-    }
-	window.go_previous_slide = go_previous_slide
-	window.go_next_slide = go_next_slide
-
-	const button_next = document.querySelector('button.changeslide.next span')
-	const button_prev = document.querySelector('button.changeslide.prev span')
-
-		
-    button_next.addEventListener('click', go_next_slide)
-    button_prev.addEventListener('click', go_previous_slide)
-
-	invalidation.then(() => {
-        button_next.removeEventListener('click', go_next_slide)
-        button_prev.removeEventListener('click', go_previous_slide)
-	})
-</script>
-""")
-
-# ╔═╡ 43c505a1-6446-413b-818e-89cbc7f19ced
-@htl("""
-<script>
-	window.get_zoom = () => {
-		let zoom = (( window.outerWidth - 10 ) / window.innerWidth) * 100;
-		// The next line rounds the zoom at steps of 5%
-		return Math.round(zoom/5)/20
-	}
-</script>
-""")
-
-# ╔═╡ 8a174275-47b5-4280-b0ab-c490a1b51bd2
-# html"""
-# <script>
-# 	const keydown = (e) => {
-# 		console.log(e)
-# 	}
-# 	document.addEventListener("keydown", keydown)
-# 	invalidation.then(() => {
-# 		document.removeEventListener("keydown", keydown)
-# 	})
-# </script>
-# """
-
-# ╔═╡ 63fa6496-fe18-4ec4-9f4a-5d6602ec094c
-md"""
-## Style
-"""
-
-# ╔═╡ b0c8b4cd-a0a0-4dfc-8851-0a4734e0460d
-presentation_zoom = 1.5
-
 # ╔═╡ 92aac9a5-f926-455a-a9b8-ecaa287eec19
 @htl("""
 <div class='inner-hidden'>
@@ -253,6 +146,19 @@ This cell creates the presentation button and handling toggling presentation/ful
 			toggle_presentation()
 		}
 	}
+
+    function scroll_to_current() {
+        if (window.is_presenting()) {
+            window.setTimeout(() => {
+                const pos = calculate_slide_positions(true)
+                window.scrollTo(window.scrollX, pos[pos.length - 1])
+                window.track_mouse = true
+                document.activeElement.blur()
+            }, 350)
+        } else {
+            window.setTimeout(scroll_to_current, 10)
+        }
+    }
 	
 	function toggle_presentation() {
 		if (is_presenting()) {
@@ -260,16 +166,17 @@ This cell creates the presentation button and handling toggling presentation/ful
 			if (document.exitFullscreen) {
 			    document.exitFullscreen();
 		  	}
+            window.present()
 		} else {
 			hide_enabled = notebook.hasAttribute('hide-enabled')
-			let zoom = $presentation_zoom / window.get_zoom()
-			document.documentElement.style.setProperty('--zoom-level', zoom);
 			// notebook.toggleAttribute('hide-enabled', false)
 			if (!document.fullscreenElement) {
 			    document.documentElement.requestFullscreen();
 			}
+            window.track_mouse = false
+            window.present()
+            scroll_to_current()
 		}
-		window.present()
 	}
 
 	document.addEventListener("keydown", shift_f5_listener)
@@ -303,6 +210,192 @@ This cell creates the presentation button and handling toggling presentation/ful
 </style>
 """) |> show_output_when_hidden
 
+# ╔═╡ a8e629fd-d1aa-4e47-81fa-db119ae82f15
+@htl("""
+<div class='inner-hidden'>
+This cell ovverides the behavior of scoll buttons to work with hidden cells and zoom level. This has only been tested in chromium and will probably not work in other browsers.
+</div>
+<script>
+	// This is adapte from Pluto/frontend/components/SlideControls.js to make it work with zoom and hidden cells
+	const calculate_slide_positions = (only_previous = false) => {
+		// We need to track separately the page zoom (the one set from the browser UI) and the css zoom we do in presentation mode. The first does not impact the size of boundingclientrect while the second does.
+		const { css_zoom, page_zoom } = window.get_zoom()
+		
+        const notebook_node = document.querySelector("pluto-notebook")
+        if (!notebook_node) return []
+
+        const height = window.innerHeight
+        let headers = Array.from(notebook_node.querySelectorAll("pluto-output h1, pluto-output h2")).filter((el) => el.getBoundingClientRect().height > 0) // We filter cells without height as they are hidden
+		if (only_previous) {
+			headers = headers.filter(el => el.hasAttribute('before'))
+		}
+        const pos = headers.map((el) => el.getBoundingClientRect()) 
+		// We multiply edges by the zoom
+        const edges = pos.map((rect) => rect.top * css_zoom + window.scrollY)
+
+        edges.push(notebook_node.getBoundingClientRect().bottom * css_zoom + window.scrollY)
+
+        const scrollPositions = headers.map((el, i) => {
+            if (el.tagName == "H1") {
+                // center vertically
+                const headingHeight = pos[i].height / page_zoom
+                return edges[i] - Math.max(0, (height - headingHeight) / 2) + 10
+            } else {
+                // align to top
+                return edges[i] - 20
+            }
+        })
+
+        return scrollPositions
+    }
+    window.calculate_slide_positions = calculate_slide_positions
+
+    const go_previous_slide = (e) => {
+		e?.preventDefault()
+		e?.stopImmediatePropagation()
+		console.log('custom previous slide')
+        const positions = calculate_slide_positions()
+
+        const pos = positions.reverse().find((y) => y < window.scrollY - 10)
+
+        if (pos) window.scrollTo(window.scrollX, pos)
+    }
+
+    const go_next_slide = (e) => {
+		e?.preventDefault()
+		e?.stopImmediatePropagation()
+		console.log('custom next slide')
+        const positions = calculate_slide_positions()
+        const pos = positions.find((y) => y - 10 > window.scrollY)
+        if (pos) window.scrollTo(window.scrollX, pos)
+    }
+	window.go_previous_slide = go_previous_slide
+	window.go_next_slide = go_next_slide
+
+	const button_next = document.querySelector('button.changeslide.next span')
+	const button_prev = document.querySelector('button.changeslide.prev span')
+
+		
+    button_next.addEventListener('click', go_next_slide)
+    button_prev.addEventListener('click', go_previous_slide)
+
+	invalidation.then(() => {
+        button_next.removeEventListener('click', go_next_slide)
+        button_prev.removeEventListener('click', go_previous_slide)
+	})
+</script>
+""")
+
+# ╔═╡ 8a174275-47b5-4280-b0ab-c490a1b51bd2
+# html"""
+# <script>
+# 	const keydown = (e) => {
+# 		console.log(e)
+# 	}
+# 	document.addEventListener("keydown", keydown)
+# 	invalidation.then(() => {
+# 		document.removeEventListener("keydown", keydown)
+# 	})
+# </script>
+# """
+
+# ╔═╡ cd3d3f61-9f76-421d-9710-f3d011bac149
+html"""
+This cell has some code to keep track of the last heading before the mouse position to move to that specific 
+<script>
+	const notebook_node = document.querySelector('pluto-notebook')
+	window.last_hovered_cell = null
+    window.track_mouse = true
+	const mousemove = (e) => {
+        if (!window.track_mouse) {return}
+		const mouseY = e.pageY
+		const cell = e.target?.closest('pluto-cell')
+		if (cell !== null) {
+			window.last_hovered_cell = cell
+		}
+        notebook_node.querySelectorAll("pluto-output h1, pluto-output h2").forEach((el) => {
+            const rect = el.getBoundingClientRect()
+            const this_top = rect.top
+			el.toggleAttribute('before', this_top <= e.clientY)
+        })
+	}
+	document.addEventListener("mousemove", mousemove)
+	invalidation.then(() => {
+		document.removeEventListener("mousemove", mousemove)
+	})
+</script>
+"""
+
+# ╔═╡ 1eb7db95-078c-409f-b60c-53132e8ccf50
+# This simplifies applying custom css to cell outputs using the emtion JS library
+function apply_css(css; class = nothing)
+	to_js(x) = HypertextLiteral.JavaScript(x)
+	function apply(item)
+		content = @htl("
+			<div class='$class'>
+				$item
+			</div>
+		")
+		isnothing(css) && return content
+		@htl("""
+			$content
+			<script>
+				const { css } = await import("https://esm.sh/@emotion/css")
+				const item = currentScript.previousElementSibling
+				const className = css`$(to_js(css))`
+				item.classList.add(className)
+			</script>
+		""")
+	end
+end
+
+# ╔═╡ ba6f6e05-bcfa-47cf-92f7-ec548f48ef3b
+md"""
+- Alberto Mengali
+- github/discourse/slack/zulip: disberd
+- Telecommunication Systems Engineer @ $(Resource("https://brand.esa.int/files/2022/10/ESA_Patch_2022-1024x1024.png", :width => 40))
+""" |> apply_css("""
+& {
+	text-align: center
+}
+""")
+
+# ╔═╡ 80876756-b4f3-48bf-894d-1669bf1dcbaa
+md"""
+- Introduction
+- Example Usage in Pluto
+- PlutoVSCodeDebugger
+- PlutoDevMacros
+""" |> apply_css("
+	body.presentation pluto-editor.fullscreen & .markdown li {
+        font-size: 1.8em;
+        margin-bottom: 2em;
+    }
+")
+
+# ╔═╡ 63fa6496-fe18-4ec4-9f4a-5d6602ec094c
+md"""
+## Style
+"""
+
+# ╔═╡ b0c8b4cd-a0a0-4dfc-8851-0a4734e0460d
+presentation_zoom = 1.5
+
+# ╔═╡ 43c505a1-6446-413b-818e-89cbc7f19ced
+@htl("""
+This cell has a function to compute the current page zoom for normalizations
+<script>
+	window.get_zoom = () => {
+		let page_zoom = (( window.outerWidth - 10 ) / window.innerWidth) * 100;
+		// The next line rounds the zoom at steps of 5%
+		page_zoom = Math.round(page_zoom/5)/20
+        const css_zoom = window.is_presenting() ? $presentation_zoom / page_zoom : 1
+        document.documentElement.style.setProperty('--zoom-level', css_zoom);
+        return { css_zoom, page_zoom }
+	}
+</script>
+""")
+
 # ╔═╡ 89920d7f-dc57-4ab9-89f7-a12c346c1d6c
 @htl("""
 Cell defining the default style inside presentation mode 
@@ -314,8 +407,17 @@ Cell defining the default style inside presentation mode
 	body.presentation pluto-editor.fullscreen {
 		zoom: var(--zoom-level, 1);
 	}
+	body.presentation pluto-editor.fullscreen h1 {
+        font-size: 2.5em;
+    }
+	body.presentation pluto-editor.fullscreen h2 {
+        font-size: 2.3em;
+    }
 </style>
 """)
+
+# ╔═╡ 580b66d7-5ed2-4b00-8728-388881961cd4
+
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -645,8 +747,11 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═67673993-85e7-46e2-ad71-fb0bf7c0dbec
 # ╟─b74207fb-0901-4897-8f75-c842f93e01c7
+# ╟─361f7679-127e-4bb3-a12e-5868785fc4f1
+# ╠═ba6f6e05-bcfa-47cf-92f7-ec548f48ef3b
 # ╟─78c648d9-f2a3-48ec-851a-b58cb93a44aa
-# ╟─80876756-b4f3-48bf-894d-1669bf1dcbaa
+# ╠═80876756-b4f3-48bf-894d-1669bf1dcbaa
+# ╠═468613ad-54ee-494c-af7c-536f9101a845
 # ╟─6200d8c1-5f84-47bd-b859-143fac60cd16
 # ╟─cfe2d6f7-9025-4ff7-a7d1-4c65d0e57e8a
 # ╠═1a5a5e07-9d4e-43ff-89d2-6c86f248a123
@@ -660,12 +765,15 @@ version = "17.4.0+2"
 # ╠═6fce800f-f375-414e-abee-ee02baf582a2
 # ╟─ae721a0d-2bc4-49e8-bd91-25f108873b33
 # ╟─ecb1d74f-dae1-4a76-a20a-0760fb772d7a
-# ╠═92aac9a5-f926-455a-a9b8-ecaa287eec19
-# ╠═a8e629fd-d1aa-4e47-81fa-db119ae82f15
-# ╠═43c505a1-6446-413b-818e-89cbc7f19ced
-# ╠═8a174275-47b5-4280-b0ab-c490a1b51bd2
+# ╟─92aac9a5-f926-455a-a9b8-ecaa287eec19
+# ╟─a8e629fd-d1aa-4e47-81fa-db119ae82f15
+# ╟─43c505a1-6446-413b-818e-89cbc7f19ced
+# ╟─8a174275-47b5-4280-b0ab-c490a1b51bd2
+# ╟─cd3d3f61-9f76-421d-9710-f3d011bac149
+# ╟─1eb7db95-078c-409f-b60c-53132e8ccf50
 # ╟─63fa6496-fe18-4ec4-9f4a-5d6602ec094c
 # ╠═b0c8b4cd-a0a0-4dfc-8851-0a4734e0460d
 # ╠═89920d7f-dc57-4ab9-89f7-a12c346c1d6c
+# ╠═580b66d7-5ed2-4b00-8728-388881961cd4
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
