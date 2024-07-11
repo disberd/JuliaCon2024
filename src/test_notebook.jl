@@ -1,6 +1,8 @@
 ### A Pluto.jl notebook ###
 # v0.19.43
 
+#> custom_attrs = ["hide-enabled"]
+
 using Markdown
 using InteractiveUtils
 
@@ -15,24 +17,104 @@ begin
 end
   ╠═╡ =#
 
-# ╔═╡ 7cdc36a5-ce59-4afa-92e9-7411ca69a4f7
-import PlutoDevMacros as PDM
-
 # ╔═╡ c3b7788b-427a-4315-ab7d-993794251175
-struct LinearArray
+@kwdef struct LinearArray
 	N::Int
+	spacing::Float64 = 0.5
 end
 
 # ╔═╡ 299a46e0-557f-4e7f-83dc-6124cc2ca422
 function get_feeds_positions(ant::LinearArray)
-	x = range(0, ant.N - 1) .* 0.5
+	x = range(0, ant.N - 1) .* ant.spacing
 end
 
 # ╔═╡ a1f8d6f0-c18d-4bde-90d3-ca81b8a9f2b4
-function compute_pattern(ant::LinearArray, θ)
-	x = get_feeds_positions(ant)
-	
+function compute_power(ant::LinearArray, θ, θ₀)
+	feeds_x = get_feeds_positions(ant)
+	out = 0.0im
+	Δu = sind(θ) - sind(θ₀)
+	for x in feeds_x
+		out += exp(2π * 1im * x * Δu)
+	end
+	out /= length(feeds_x)
+	return 10log10(abs2(out))
 end
+
+# ╔═╡ 581794b6-a190-45f5-93fe-e7de6a15090f
+#=╠═╡
+function plot_pattern(ant, θ₀)
+	x = range(-90, 90; step = 0.05)
+	y = map(θ -> compute_power(ant, θ, θ₀), x)
+	data = scatter(;x,y)
+	plot(data, Layout(;
+		template = "none",
+		xaxis = attr(;
+			title = "Pointing Angle θ [°]",
+			dtick = 15,
+		),
+		yaxis = attr(;
+			title = "Normalized Power [dB]",
+			range = [-30, 0],
+			zeroline = false,
+		),
+		uirevision = 1,
+		title = "Antenna Gain, Pointing Direction = $(round(θ₀; digits=2)) °"
+	))
+end
+  ╠═╡ =#
+
+# ╔═╡ 0017d7da-d5a8-4ca5-83c9-fce41bddcb3b
+md"""
+# Misc
+"""
+
+# ╔═╡ b2e4f616-3ecd-46d3-b377-d85385d4b836
+md"""
+## Packages
+"""
+
+# ╔═╡ 7cdc36a5-ce59-4afa-92e9-7411ca69a4f7
+import PlutoDevMacros as PDM
+
+# ╔═╡ 009f49ab-d6cb-44f8-afdc-85c42bfa01b5
+md"""
+## Bonds
+"""
+
+# ╔═╡ 46bb08cb-7ac3-4b8a-9f66-ed043c78767c
+#=╠═╡
+bond = @bind params @NTBond "Parameters" begin
+	N = ("Number of Elements", Slider(10:100; show_value=true))
+	spacing = ("Elements Spacing [ͅλ]", Slider(range(0.5, 2.5; step=0.05); show_value=true))
+	θ₀ = ("Pointing Angle [°]", Slider(-90:90; default=0,show_value=true))
+end;
+  ╠═╡ =#
+
+# ╔═╡ 8824bb11-1274-47eb-bdb2-65cf0972c228
+#=╠═╡
+ant = let
+	(; N, spacing) = params
+	ant = LinearArray(;N, spacing)
+end
+  ╠═╡ =#
+
+# ╔═╡ 0d2c8fb1-07f1-4fb5-a55d-31e3ca75e2f5
+#=╠═╡
+let
+	(; θ₀) = params
+	plot_pattern(ant, θ₀)
+end
+  ╠═╡ =#
+
+# ╔═╡ 876ddb4e-4f40-4f73-afc8-29e5ee5dc964
+#=╠═╡
+BondTable([bond])
+  ╠═╡ =#
+
+# ╔═╡ 4daec680-c779-4b48-9fe1-6f836f4bbb31
+#=╠═╡
+ExtendedTableOfContents(; hide_preamble=false)
+  ╠═╡ =#
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -442,10 +524,19 @@ version = "17.4.0+2"
 """
 
 # ╔═╡ Cell order:
-# ╠═7cdc36a5-ce59-4afa-92e9-7411ca69a4f7
-# ╠═b19a1ce3-ad9f-495a-80a7-f595f3ad4f9e
 # ╠═c3b7788b-427a-4315-ab7d-993794251175
 # ╠═299a46e0-557f-4e7f-83dc-6124cc2ca422
 # ╠═a1f8d6f0-c18d-4bde-90d3-ca81b8a9f2b4
+# ╠═581794b6-a190-45f5-93fe-e7de6a15090f
+# ╠═8824bb11-1274-47eb-bdb2-65cf0972c228
+# ╠═0d2c8fb1-07f1-4fb5-a55d-31e3ca75e2f5
+# ╠═0017d7da-d5a8-4ca5-83c9-fce41bddcb3b
+# ╠═b2e4f616-3ecd-46d3-b377-d85385d4b836
+# ╠═7cdc36a5-ce59-4afa-92e9-7411ca69a4f7
+# ╠═b19a1ce3-ad9f-495a-80a7-f595f3ad4f9e
+# ╠═009f49ab-d6cb-44f8-afdc-85c42bfa01b5
+# ╠═46bb08cb-7ac3-4b8a-9f66-ed043c78767c
+# ╠═876ddb4e-4f40-4f73-afc8-29e5ee5dc964
+# ╠═4daec680-c779-4b48-9fe1-6f836f4bbb31
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
