@@ -4,8 +4,8 @@ authors = ["Alberto Mengali <disberd@gmail.com>"]
 version = "0.1.0"
 
 [deps]
-Example = "7876af07-990d-54b4-ab0e-23690620f79a"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 Markdown = "d6f4376e-aef5-505a-96c1-9c027394607a"
 PlotlyExtensionsHelper = "a7e57fc7-3548-4021-90c3-ac0e175068b1"
 PlutoDevMacros = "a0499f29-c39b-4c5c-807c-88074221b949"

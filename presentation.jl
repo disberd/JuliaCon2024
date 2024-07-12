@@ -64,12 +64,12 @@ md"""
 
 # ╔═╡ f399643a-157e-4096-b3f5-74898bd94015
 md"""
-Most Basic use, behavior depends on whether notebook is included in package:
+Most basic use, behavior depends on whether notebook is included in package:
 ```julia
 # Import everything from the package root module in the current folder
 @fromparent import * 
 ```
-More advanced use, with different path and multiple import statements
+More advanced use, with different path and multiple import statements:
 ```julia
 # Import from a package at a specific path
 @frompackage "path" begin
@@ -78,7 +78,7 @@ More advanced use, with different path and multiple import statements
 	import ^.SubModule: a, b # Import from a specific submodule of the package
 end
 ```
-Special use when notebook is included in package
+Special use when notebook is included in package:
 ```julia
 # Import in a notebook that is included in the package source
 @fromparent begin
@@ -436,8 +436,8 @@ md"""
 md"""
 - Introduction
 - Motivation
-- Pluto Demo
 - Implementation Details
+- Pluto Demo
 - Issues and Future Work
 """ |> apply_css("
 	body.presentation pluto-editor.fullscreen & .markdown li {
@@ -454,8 +454,8 @@ md"""
 - PlutoDevMacros
   - Load local package code inside a a pluto notebook.
   - Similar to Revise.jl
-    - Allows automatically importing all names into scope
-    - Allows redefinition of structs
+    - Allows to automatically import all names into scope
+    - Allows to redefine structs
     - Automatically executes cells that depends on package upon reload
 - PlutoVSCodeDebugger
   - Hooks a running VSCode instance to the Pluto notebook
@@ -496,7 +496,7 @@ md"""
         margin: 0 0;
     }
 	body.presentation pluto-editor.fullscreen & li p {
-        margin-bottom: 1rem;
+        margin-bottom: 1.4rem;
     }
 	body.presentation pluto-editor.fullscreen & .markdown li {
         font-size: 1.5rem;
@@ -519,6 +519,7 @@ md"""
   - Package Extensions
   - `__init__` function
   - import X as Y
+  - 2-arguments `include(mapexpr, file)`
 - Mimic `include` load order for notebooks as package source:
   - Give the notebook access to all variables defined before its inclusion
 """ |> apply_css("
@@ -526,10 +527,10 @@ md"""
         margin: 0 0;
     }
 	body.presentation pluto-editor.fullscreen & li p {
-        margin-bottom: .7rem;
+        margin-bottom: .5rem;
     }
 	body.presentation pluto-editor.fullscreen & .markdown li {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
     }
 	body.presentation pluto-editor.fullscreen & .markdown li li {
         font-size: 1.2rem;
@@ -546,11 +547,11 @@ The macro basically performs the following steps:
 - Add the project to the end of the LOAD_PATH
 - Create a temporary module in the notebook workspace
 - Parse and evaluate the package code in the temporary module
-  - Internally uses CodeInterpreter.jl
+  - Internally uses JuliaInterpreter.jl
 - Run `__init__` if present
 - Load extension code if applicable
 - If called with `import *`, explicitly imports all the names
-- Send some custom HTML/JS code as last output
+- Send some custom HTML/JS code as last output for reload button
 """ |> apply_css("
 	body.presentation pluto-editor.fullscreen & ul {
         margin: 0 0;
@@ -711,9 +712,6 @@ Cell defining the default style inside presentation mode
 	}
 </style>
 """)
-
-# ╔═╡ 580b66d7-5ed2-4b00-8728-388881961cd4
-
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1100,7 +1098,6 @@ version = "17.4.0+2"
 # ╟─1eb7db95-078c-409f-b60c-53132e8ccf50
 # ╟─63fa6496-fe18-4ec4-9f4a-5d6602ec094c
 # ╠═b0c8b4cd-a0a0-4dfc-8851-0a4734e0460d
-# ╠═89920d7f-dc57-4ab9-89f7-a12c346c1d6c
-# ╠═580b66d7-5ed2-4b00-8728-388881961cd4
+# ╟─89920d7f-dc57-4ab9-89f7-a12c346c1d6c
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

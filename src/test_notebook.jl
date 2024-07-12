@@ -1,8 +1,6 @@
 ### A Pluto.jl notebook ###
 # v0.19.43
 
-#> custom_attrs = ["hide-enabled"]
-
 using Markdown
 using InteractiveUtils
 
@@ -47,7 +45,6 @@ md"""
 # ╔═╡ c3b7788b-427a-4315-ab7d-993794251175
 @kwdef struct LinearArray
 	N::Int
-	# spacing::Float64 = 0.5
 end
 
 # ╔═╡ f3073ef9-a3e3-45da-81a5-a0ce69335f85
@@ -106,7 +103,7 @@ end
   ╠═╡ =#
 
 # ╔═╡ 0017d7da-d5a8-4ca5-83c9-fce41bddcb3b
-# ╠═╡ custom_attrs = ["toc-hidden"]
+# ╠═╡ custom_attrs = ["toc-hidden", "toc-collapsed"]
 md"""
 # Misc
 """
@@ -158,7 +155,7 @@ end
 bond = @bind params @NTBond "Antenna Parameters" begin
 	N = ("Number of Elements", Slider(10:30; show_value=true))
 	# spacing = ("Elements Spacing [ͅλ]", Slider(range(0.5, 2.5; step=0.05); show_value=true))
-end;
+end
   ╠═╡ =#
 
 # ╔═╡ 8824bb11-1274-47eb-bdb2-65cf0972c228
