@@ -567,6 +567,7 @@ The macro basically performs the following steps:
 
 # ╔═╡ 54547c75-6423-4955-a43c-c5c523c643db
 md"""
+- `@exclude_usings` in front of `import *` to skip `using` names
 - The macro tries to limits use of julia internals by default
 - Some situations require doing some more *hacks*
 - Three flags can be used to customize behavior, all in the form `name = value`
@@ -579,13 +580,13 @@ md"""
         margin: 0 0;
     }
 	body.presentation pluto-editor.fullscreen & li p {
-        margin-bottom: .6rem;
+        margin-bottom: .3rem;
     }
 	body.presentation pluto-editor.fullscreen & .markdown li {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
     }
 	body.presentation pluto-editor.fullscreen & .markdown li li {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
 ")
 
@@ -712,6 +713,9 @@ Cell defining the default style inside presentation mode
 	}
 </style>
 """)
+
+# ╔═╡ 580b66d7-5ed2-4b00-8728-388881961cd4
+
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1098,6 +1102,7 @@ version = "17.4.0+2"
 # ╟─1eb7db95-078c-409f-b60c-53132e8ccf50
 # ╟─63fa6496-fe18-4ec4-9f4a-5d6602ec094c
 # ╠═b0c8b4cd-a0a0-4dfc-8851-0a4734e0460d
-# ╟─89920d7f-dc57-4ab9-89f7-a12c346c1d6c
+# ╠═89920d7f-dc57-4ab9-89f7-a12c346c1d6c
+# ╠═580b66d7-5ed2-4b00-8728-388881961cd4
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
