@@ -613,10 +613,12 @@ md"""
 md"""
 - Possible version mismatch of dependencies between notebook and package environment
   - Add some warning in case different versions are seen in the two manifests
+- Only packages are supported, and only one per notebook
+  - Future PR to add support for non-package environments
 - First call to `@frompackage` might be quite long, and logging does not appear in Pluto before macro is compiled
   - Hope to fix this in Pluto PR
 - All code is re-loaded every time the macro is executed
-  - Attempt to integrate Revise.jl to only reload the full code if Revise fails
+  - Attempt to integrate Revise.jl to only reload the full code if Revise fails in future PR
 - Still relies on internals of Base and Pluto
 """ |> apply_css("
 	body.presentation pluto-editor.fullscreen & ul {
@@ -626,10 +628,10 @@ md"""
         margin-bottom: .6rem;
     }
 	body.presentation pluto-editor.fullscreen & .markdown li {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
     }
 	body.presentation pluto-editor.fullscreen & .markdown li li {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
 ")
 
