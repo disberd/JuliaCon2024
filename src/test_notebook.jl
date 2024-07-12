@@ -1,6 +1,8 @@
 ### A Pluto.jl notebook ###
 # v0.19.43
 
+#> custom_attrs = ["hide-enabled"]
+
 using Markdown
 using InteractiveUtils
 
@@ -18,6 +20,15 @@ begin
 	using HypertextLiteral
 end
   ╠═╡ =#
+
+# ╔═╡ 4485724a-5957-490a-8e95-b4a954d8244e
+@fromparent import *
+
+# ╔═╡ caedbe07-fa22-4f7c-b2ad-7fbcdd7aaa52
+names(SimpleAntenna; all=true)
+
+# ╔═╡ d5fe8f95-ef5a-4ef7-973f-10341de7d894
+a
 
 # ╔═╡ 39457bfb-217c-41be-aa03-12700390ecd0
 # ╠═╡ custom_attrs = ["toc-hidden"]
@@ -45,6 +56,7 @@ md"""
 # ╔═╡ c3b7788b-427a-4315-ab7d-993794251175
 @kwdef struct LinearArray
 	N::Int
+	spacing::Float64 = 0.5
 end
 
 # ╔═╡ f3073ef9-a3e3-45da-81a5-a0ce69335f85
@@ -54,7 +66,7 @@ md"""
 
 # ╔═╡ 299a46e0-557f-4e7f-83dc-6124cc2ca422
 function get_feeds_positions(ant::LinearArray)
-	x = range(0, ant.N - 1) .* 0.5
+	x = range(0, ant.N - 1) .* ant.spacing
 end
 
 # ╔═╡ 647b1d4d-f8e5-4e62-ace6-87c83a73036f
@@ -154,16 +166,21 @@ end
 #=╠═╡
 bond = @bind params @NTBond "Antenna Parameters" begin
 	N = ("Number of Elements", Slider(10:30; show_value=true))
-	# spacing = ("Elements Spacing [ͅλ]", Slider(range(0.5, 2.5; step=0.05); show_value=true))
+	spacing = ("Elements Spacing [ͅλ]", Slider(range(0.5, 2.5; step=0.05); show_value=true))
 end
   ╠═╡ =#
 
 # ╔═╡ 8824bb11-1274-47eb-bdb2-65cf0972c228
 #=╠═╡
 ant = let
-	(; N) = params
-	ant = LinearArray(;N)
+	(; N, spacing) = params
+	ant = LinearArray(;N, spacing)
 end
+  ╠═╡ =#
+
+# ╔═╡ 3511a64b-7f4a-430b-9a61-d481fc298cfc
+#=╠═╡
+plot_pattern(ant, θ₀)
   ╠═╡ =#
 
 # ╔═╡ 876ddb4e-4f40-4f73-afc8-29e5ee5dc964
@@ -182,6 +199,9 @@ $(ExtendedTableOfContents(;hide_preamble = false))
 </script>
 """)
   ╠═╡ =#
+
+# ╔═╡ 8dcfa780-2d56-4523-aa3c-c39f17fe883f
+
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -594,6 +614,9 @@ version = "17.4.0+2"
 
 # ╔═╡ Cell order:
 # ╠═7cdc36a5-ce59-4afa-92e9-7411ca69a4f7
+# ╠═4485724a-5957-490a-8e95-b4a954d8244e
+# ╠═caedbe07-fa22-4f7c-b2ad-7fbcdd7aaa52
+# ╠═d5fe8f95-ef5a-4ef7-973f-10341de7d894
 # ╟─39457bfb-217c-41be-aa03-12700390ecd0
 # ╟─f2b09d98-a0ea-4e99-bc24-ccf56f82f20f
 # ╟─39f97e69-8677-46d2-8ea0-80ea62770d1e
@@ -605,6 +628,7 @@ version = "17.4.0+2"
 # ╟─b759c442-ec13-4537-96e5-df5d8fabece5
 # ╠═581794b6-a190-45f5-93fe-e7de6a15090f
 # ╠═8824bb11-1274-47eb-bdb2-65cf0972c228
+# ╠═3511a64b-7f4a-430b-9a61-d481fc298cfc
 # ╟─0017d7da-d5a8-4ca5-83c9-fce41bddcb3b
 # ╠═de07cd53-762d-4d1e-852f-bf60ccfb86d6
 # ╟─b2e4f616-3ecd-46d3-b377-d85385d4b836
@@ -614,5 +638,6 @@ version = "17.4.0+2"
 # ╠═46bb08cb-7ac3-4b8a-9f66-ed043c78767c
 # ╠═876ddb4e-4f40-4f73-afc8-29e5ee5dc964
 # ╠═4daec680-c779-4b48-9fe1-6f836f4bbb31
+# ╠═8dcfa780-2d56-4523-aa3c-c39f17fe883f
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

@@ -108,6 +108,26 @@ md"""
 # Pluto Demo
 """
 
+# ╔═╡ b1f43042-5611-4246-8e4c-ce9e9ba4d464
+@fromparent import *
+
+# ╔═╡ b0f7a056-ee94-41a0-b0ec-2b15d129fc78
+LinearArray(;N = 10)
+
+# ╔═╡ 102e2f77-8432-442e-b106-ab30ad141df1
+md"""
+## PlutoVSCodeDebugger
+"""
+
+# ╔═╡ 66e59750-d314-4794-84e8-d6e531027f95
+md"""
+I unfortunately greatly miscalculated my presentation time, and was not able to show the use of PlutoVSCodeDebugger.jl
+
+Luckily enough, the documentation of PlutoVSCodeDebugger has nice video examples on how it can be used:
+- [github page](https://github.com/disberd/PlutoVSCodeDebugger.jl)
+- [Package Documentation](https://disberd.github.io/PlutoVSCodeDebugger.jl/stable/)
+"""
+
 # ╔═╡ 2b685321-4105-4ca6-9604-d9858c296318
 md"""
 # Issues and Future Work
@@ -1083,6 +1103,10 @@ version = "17.4.0+2"
 # ╟─1604cb84-3023-4d5c-a24c-ff3f03375214
 # ╟─b79d0c0b-6e75-4ba5-a4ac-a57348f2372f
 # ╟─6200d8c1-5f84-47bd-b859-143fac60cd16
+# ╠═b1f43042-5611-4246-8e4c-ce9e9ba4d464
+# ╠═b0f7a056-ee94-41a0-b0ec-2b15d129fc78
+# ╟─102e2f77-8432-442e-b106-ab30ad141df1
+# ╟─66e59750-d314-4794-84e8-d6e531027f95
 # ╟─2b685321-4105-4ca6-9604-d9858c296318
 # ╟─fe4951fd-e7de-43f5-aeaf-9b4d21640ed0
 # ╟─74956b5a-3f55-45ef-bb6b-447c0d2c0c0d
