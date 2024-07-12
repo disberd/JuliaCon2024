@@ -1,6 +1,8 @@
 ### A Pluto.jl notebook ###
 # v0.19.43
 
+#> custom_attrs = ["hide-enabled"]
+
 using Markdown
 using InteractiveUtils
 
@@ -20,6 +22,7 @@ end
   ╠═╡ =#
 
 # ╔═╡ 39457bfb-217c-41be-aa03-12700390ecd0
+# ╠═╡ custom_attrs = ["toc-hidden"]
 md"""
 # Antenna Concept
 """
@@ -38,19 +41,29 @@ end
 
 # ╔═╡ 39f97e69-8677-46d2-8ea0-80ea62770d1e
 md"""
-# Struct Definition
+## Struct Definition
 """
 
 # ╔═╡ c3b7788b-427a-4315-ab7d-993794251175
 @kwdef struct LinearArray
 	N::Int
-	spacing::Float64 = 0.5
+	# spacing::Float64 = 0.5
 end
+
+# ╔═╡ f3073ef9-a3e3-45da-81a5-a0ce69335f85
+md"""
+## Feeds Position
+"""
 
 # ╔═╡ 299a46e0-557f-4e7f-83dc-6124cc2ca422
 function get_feeds_positions(ant::LinearArray)
-	x = range(0, ant.N - 1) .* ant.spacing
+	x = range(0, ant.N - 1) .* 0.5
 end
+
+# ╔═╡ 647b1d4d-f8e5-4e62-ace6-87c83a73036f
+md"""
+## Radiated Power
+"""
 
 # ╔═╡ a1f8d6f0-c18d-4bde-90d3-ca81b8a9f2b4
 function compute_power(ant::LinearArray, θ, θ₀)
@@ -63,6 +76,11 @@ function compute_power(ant::LinearArray, θ, θ₀)
 	out /= length(feeds_x)
 	return 10log10(abs2(out))
 end
+
+# ╔═╡ b759c442-ec13-4537-96e5-df5d8fabece5
+md"""
+## Plot
+"""
 
 # ╔═╡ 581794b6-a190-45f5-93fe-e7de6a15090f
 #=╠═╡
@@ -139,21 +157,16 @@ end
 #=╠═╡
 bond = @bind params @NTBond "Antenna Parameters" begin
 	N = ("Number of Elements", Slider(10:30; show_value=true))
-	spacing = ("Elements Spacing [ͅλ]", Slider(range(0.5, 2.5; step=0.05); show_value=true))
+	# spacing = ("Elements Spacing [ͅλ]", Slider(range(0.5, 2.5; step=0.05); show_value=true))
 end;
   ╠═╡ =#
 
 # ╔═╡ 8824bb11-1274-47eb-bdb2-65cf0972c228
 #=╠═╡
 ant = let
-	(; N, spacing) = params
-	ant = LinearArray(;N, spacing)
+	(; N) = params
+	ant = LinearArray(;N)
 end
-  ╠═╡ =#
-
-# ╔═╡ 0d2c8fb1-07f1-4fb5-a55d-31e3ca75e2f5
-#=╠═╡
-plot_pattern(ant, θ₀)
   ╠═╡ =#
 
 # ╔═╡ 876ddb4e-4f40-4f73-afc8-29e5ee5dc964
@@ -429,9 +442,9 @@ version = "0.8.19"
 
 [[deps.PlutoDevMacros]]
 deps = ["JuliaInterpreter", "Logging", "MacroTools", "Pkg", "TOML"]
-git-tree-sha1 = "9e1d5cbbfba0c9f2d776831bd5efb1bb38802794"
+git-tree-sha1 = "72f65885168722413c7b9a9debc504c7e7df7709"
 uuid = "a0499f29-c39b-4c5c-807c-88074221b949"
-version = "0.9.0-DEV"
+version = "0.9.0"
 
 [[deps.PlutoExtras]]
 deps = ["AbstractPlutoDingetjes", "DocStringExtensions", "HypertextLiteral", "InteractiveUtils", "Markdown", "PlutoUI", "REPL", "Random"]
@@ -583,19 +596,21 @@ version = "17.4.0+2"
 """
 
 # ╔═╡ Cell order:
+# ╠═7cdc36a5-ce59-4afa-92e9-7411ca69a4f7
 # ╟─39457bfb-217c-41be-aa03-12700390ecd0
-# ╠═f2b09d98-a0ea-4e99-bc24-ccf56f82f20f
+# ╟─f2b09d98-a0ea-4e99-bc24-ccf56f82f20f
 # ╟─39f97e69-8677-46d2-8ea0-80ea62770d1e
 # ╠═c3b7788b-427a-4315-ab7d-993794251175
+# ╟─f3073ef9-a3e3-45da-81a5-a0ce69335f85
 # ╠═299a46e0-557f-4e7f-83dc-6124cc2ca422
+# ╟─647b1d4d-f8e5-4e62-ace6-87c83a73036f
 # ╠═a1f8d6f0-c18d-4bde-90d3-ca81b8a9f2b4
+# ╟─b759c442-ec13-4537-96e5-df5d8fabece5
 # ╠═581794b6-a190-45f5-93fe-e7de6a15090f
 # ╠═8824bb11-1274-47eb-bdb2-65cf0972c228
-# ╠═0d2c8fb1-07f1-4fb5-a55d-31e3ca75e2f5
 # ╟─0017d7da-d5a8-4ca5-83c9-fce41bddcb3b
 # ╠═de07cd53-762d-4d1e-852f-bf60ccfb86d6
 # ╟─b2e4f616-3ecd-46d3-b377-d85385d4b836
-# ╠═7cdc36a5-ce59-4afa-92e9-7411ca69a4f7
 # ╠═b19a1ce3-ad9f-495a-80a7-f595f3ad4f9e
 # ╟─009f49ab-d6cb-44f8-afdc-85c42bfa01b5
 # ╠═e769942b-fcaa-46ca-b129-8ce142161d95

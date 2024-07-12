@@ -929,9 +929,9 @@ version = "1.10.0"
 
 [[deps.PlutoDevMacros]]
 deps = ["JuliaInterpreter", "Logging", "MacroTools", "Pkg", "TOML"]
-git-tree-sha1 = "9e1d5cbbfba0c9f2d776831bd5efb1bb38802794"
+git-tree-sha1 = "72f65885168722413c7b9a9debc504c7e7df7709"
 uuid = "a0499f29-c39b-4c5c-807c-88074221b949"
-version = "0.9.0-DEV"
+version = "0.9.0"
 
 [[deps.PlutoExtras]]
 deps = ["AbstractPlutoDingetjes", "DocStringExtensions", "HypertextLiteral", "InteractiveUtils", "Markdown", "PlutoUI", "REPL", "Random"]
