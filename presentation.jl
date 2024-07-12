@@ -13,12 +13,21 @@ begin
 	using PlutoExtras
 	using PlutoExtras.StructBondModule
 	using HypertextLiteral
+	using MarkdownLiteral: @mdx
 end
 
 # ╔═╡ 67673993-85e7-46e2-ad71-fb0bf7c0dbec
-ExtendedTableOfContents()
+@htl("""
+$(ExtendedTableOfContents())
+<script>
+	const cell = currentScript.closest('pluto-cell')
+	cell.toggleAttribute('always-show',false)
+	cell.toggleAttribute('always-show-output',true)
+</script>
+""")
 
 # ╔═╡ b74207fb-0901-4897-8f75-c842f93e01c7
+# ╠═╡ custom_attrs = ["toc-collapsed"]
 md"""
 # 🎈 Pluto.jl – Interactive package development and debugging
 """
@@ -34,40 +43,84 @@ md"""
 """
 
 # ╔═╡ 468613ad-54ee-494c-af7c-536f9101a845
-
-
-# ╔═╡ 6200d8c1-5f84-47bd-b859-143fac60cd16
-md"""
-# Example Use
-"""
-
-# ╔═╡ cfe2d6f7-9025-4ff7-a7d1-4c65d0e57e8a
 md"""
 ## Introduction
 """
 
-# ╔═╡ 1a5a5e07-9d4e-43ff-89d2-6c86f248a123
-Resource("https://upload.wikimedia.org/wikipedia/commons/4/4a/Phased_array_animation_with_arrow_10frames_371x400px_100ms.gif")
-
-# ╔═╡ 4ba4ee89-e7e5-4f94-845e-99d29ffdff2d
-@fromparent import *
-
-# ╔═╡ eeea367f-df6c-4d32-8764-97eaf1d2439d
-struct LinearPhasedArray
-	N::Int
-end
-
-# ╔═╡ e4895912-285b-433d-b58e-92a326bc963b
-SimpleAntenna
-
-# ╔═╡ 720ea93f-c1d5-4243-980c-381e4eeca461
+# ╔═╡ 1dfb599b-63f1-4f3c-8aa1-1dd60c597a77
 md"""
-# PlutoVSCodeDebugger
+## Motivation
+"""
+
+# ╔═╡ 29fbed9d-f99b-4765-a914-a3d7dd89e44b
+md"""
+## PlutoDevMacros: Desired Features
+"""
+
+# ╔═╡ c32e3918-364f-47b8-b857-a2cd5a20fb7f
+md"""
+## Basic Usage
+"""
+
+# ╔═╡ f399643a-157e-4096-b3f5-74898bd94015
+md"""
+Most Basic use, behavior depends on whether notebook is included in package:
+```julia
+# Import everything from the package root module in the current folder
+@fromparent import * 
+```
+More advanced use, with different path and multiple import statements
+```julia
+# Import from a package at a specific path
+@frompackage "path" begin
+	using PackageModule # Only brings exported names
+	import >.Dependency as Something # Load a direct or indirect dependency with alternative name
+	import ^.SubModule: a, b # Import from a specific submodule of the package
+end
+```
+Special use when notebook is included in package
+```julia
+# Import in a notebook that is included in the package source
+@fromparent begin
+	import ParentModule: * # Equivalent to import * for notebook included in package
+	using ..OtherSubmodule # Use relative modules
+end
+```
+"""
+
+# ╔═╡ 016a037f-2e8e-4390-8800-59e08e3bfb38
+md"""
+## Implementation Details
+"""
+
+# ╔═╡ 40baba4f-c2b4-41d8-92ea-bca5eeb05cbc
+md"""
+## Advanced Use
+"""
+
+# ╔═╡ 1604cb84-3023-4d5c-a24c-ff3f03375214
+md"""
+## PlutoVSCodeDebugger Impl.
+"""
+
+# ╔═╡ 6200d8c1-5f84-47bd-b859-143fac60cd16
+md"""
+# Pluto Demo
 """
 
 # ╔═╡ 2b685321-4105-4ca6-9604-d9858c296318
 md"""
-# PlutoDevMacros
+# Issues and Future Work
+"""
+
+# ╔═╡ fe4951fd-e7de-43f5-aeaf-9b4d21640ed0
+md"""
+## PlutoDevMacros
+"""
+
+# ╔═╡ 5f2e8a98-5911-4070-b0eb-43591f406891
+md"""
+## PlutoVSCodeDebugger
 """
 
 # ╔═╡ 41e6fb64-27a0-4054-ac56-6837d835aaf0
@@ -161,6 +214,17 @@ This cell creates the presentation button and handling toggling presentation/ful
             window.setTimeout(scroll_to_current, 10)
         }
     }
+
+    function scroll_to_cell() {
+        if (window.is_presenting()) {
+            window.setTimeout(scroll_to_cell, 10)
+        } else {
+            window.setTimeout(() => {
+                window.last_hovered_cell.scrollIntoView()
+                window.track_mouse = true
+            }, 150)
+        }
+    }
 	
 	function toggle_presentation() {
 		if (is_presenting()) {
@@ -168,7 +232,9 @@ This cell creates the presentation button and handling toggling presentation/ful
 			if (document.exitFullscreen) {
 			    document.exitFullscreen();
 		  	}
+            window.track_mouse = false
             window.present()
+            scroll_to_cell()
 		} else {
 			hide_enabled = notebook.hasAttribute('hide-enabled')
 			// notebook.toggleAttribute('hide-enabled', false)
@@ -355,24 +421,246 @@ end
 md"""
 - Alberto Mengali
 - github/discourse/slack/zulip: disberd
-- Telecommunication Systems Engineer @ $(Resource("https://brand.esa.int/files/2022/10/ESA_Patch_2022-1024x1024.png", :width => 40))
-""" |> apply_css("""
-& {
-	text-align: center
-}
-""")
+- Telecommunication Systems Engineer @ European Space Agency
+- Pluto lover and contributor
+- **Packages**: PlutoPlotly.jl, PlutoExtras.jl and other mostly Pluto related stuff.
+- **Presentation Material**: [https://github.com/disberd/JuliaCon2024](https://github.com/disberd/JuliaCon2024)
+""" |> apply_css("
+    body.presentation & li {
+        margin: 1rem 0;
+        font-size: 1.5rem;
+    }
+")
 
 # ╔═╡ 80876756-b4f3-48bf-894d-1669bf1dcbaa
 md"""
 - Introduction
-- Example Usage in Pluto
-- PlutoVSCodeDebugger
-- PlutoDevMacros
+- Motivation
+- Pluto Demo
+- Implementation Details
+- Issues and Future Work
 """ |> apply_css("
 	body.presentation pluto-editor.fullscreen & .markdown li {
-        font-size: 1.8em;
-        margin-bottom: 2em;
+        font-size: 1.5rem;
+        margin-bottom: 2.5rem;
     }
+	body.presentation pluto-editor.fullscreen & ul {
+        margin: 0 0;
+    }
+")
+
+# ╔═╡ 2a05d4a9-dd6b-4698-86f5-1a68e5a5db07
+md"""
+- PlutoDevMacros
+  - Load local package code inside a a pluto notebook.
+  - Similar to Revise.jl
+    - Allows automatically importing all names into scope
+    - Allows redefinition of structs
+    - Automatically executes cells that depends on package upon reload
+- PlutoVSCodeDebugger
+  - Hooks a running VSCode instance to the Pluto notebook
+    - Debug code from Pluto using `@run` and `@enter`
+    - Open source in VSCode from Pluto using `@edit`
+""" |> apply_css("
+	body.presentation pluto-editor.fullscreen & li p+ul {
+        margin-block-start: 0px;
+    }
+	body.presentation pluto-editor.fullscreen & ul {
+        margin: 0 0;
+    }
+	body.presentation pluto-editor.fullscreen & li p {
+        margin-bottom: .5rem;
+    }
+	body.presentation pluto-editor.fullscreen & .markdown li {
+        font-size: 1.5rem;
+    }
+	body.presentation pluto-editor.fullscreen & .markdown li li {
+        font-size: 1.3rem;
+    }
+	body.presentation pluto-editor.fullscreen & .markdown li li li {
+        font-size: 1.2rem;
+    }
+")
+
+# ╔═╡ 2980db17-58ae-4780-9a56-1283a7991b23
+md"""
+- Integrate Pluto as much as possible into package development
+  - Focus more on design and implementation
+  - Reduce tedious steps in verifying the impact of code changes
+  - Reduce the need of restarting julia (redefining structs)
+- Pluto notebooks as package building blocks$(html"<sup>*</sup>")
+- Simplify testing of package extensions
+- Allow to debug code from a Pluto notebook
+""" |> apply_css("
+	body.presentation pluto-editor.fullscreen & ul {
+        margin: 0 0;
+    }
+	body.presentation pluto-editor.fullscreen & li p {
+        margin-bottom: 1rem;
+    }
+	body.presentation pluto-editor.fullscreen & .markdown li {
+        font-size: 1.5rem;
+    }
+	body.presentation pluto-editor.fullscreen & .markdown li li {
+        font-size: 1.3rem;
+    }
+	body.presentation pluto-editor.fullscreen & .markdown li li li {
+        font-size: 1.2rem;
+    }
+")
+
+# ╔═╡ 903c695a-22db-4c73-8a74-8218e80a2bb4
+md"""
+- Work as a Revise replacement, with enhanced features
+- Load local code without fiddling with Pluto PkgManager
+- Access package variable/names without explicit `export`
+  - Including names imported with `using`
+- Support most of features supported in normal julia
+  - Package Extensions
+  - `__init__` function
+  - import X as Y
+- Mimic `include` load order for notebooks as package source:
+  - Give the notebook access to all variables defined before its inclusion
+""" |> apply_css("
+	body.presentation pluto-editor.fullscreen & ul {
+        margin: 0 0;
+    }
+	body.presentation pluto-editor.fullscreen & li p {
+        margin-bottom: .7rem;
+    }
+	body.presentation pluto-editor.fullscreen & .markdown li {
+        font-size: 1.4rem;
+    }
+	body.presentation pluto-editor.fullscreen & .markdown li li {
+        font-size: 1.2rem;
+    }
+	body.presentation pluto-editor.fullscreen & .markdown li li li {
+        font-size: 1.2rem;
+    }
+")
+
+# ╔═╡ 26e3c22f-68d2-4230-8952-2f548ce94fd4
+md"""
+The macro basically performs the following steps:
+- Identify the project associated to the provided path
+- Add the project to the end of the LOAD_PATH
+- Create a temporary module in the notebook workspace
+- Parse and evaluate the package code in the temporary module
+  - Internally uses CodeInterpreter.jl
+- Run `__init__` if present
+- Load extension code if applicable
+- If called with `import *`, explicitly imports all the names
+- Send some custom HTML/JS code as last output
+""" |> apply_css("
+	body.presentation pluto-editor.fullscreen & ul {
+        margin: 0 0;
+    }
+	body.presentation pluto-editor.fullscreen & li p {
+        margin-bottom: 1rem;
+    }
+    body.presentation pluto-editor.fullscreen & p,
+	body.presentation pluto-editor.fullscreen & .markdown li {
+        font-size: 1.2rem;
+    }
+")
+
+# ╔═╡ 54547c75-6423-4955-a43c-c5c523c643db
+md"""
+- The macro tries to limits use of julia internals by default
+- Some situations require doing some more *hacks*
+- Three flags can be used to customize behavior, all in the form `name = value`
+  - `rootmodule::Bool`: Defaults to false, register the generated module as root and registers it's path if set to `true`
+    - Useful for packages relying on `pkgversion` or similar (e.g. `@get_scratch`)
+  - `manifest::Symbol`: Specifies whether the Manifest.toml should be created if missing (`:instantiate` or `:resolve`), throws error by default is missing.
+  - `verbose::Bool`: Prints some additional logs, e.g. for showing when extensions are loaded
+""" |> apply_css("
+	body.presentation pluto-editor.fullscreen & ul {
+        margin: 0 0;
+    }
+	body.presentation pluto-editor.fullscreen & li p {
+        margin-bottom: .6rem;
+    }
+	body.presentation pluto-editor.fullscreen & .markdown li {
+        font-size: 1.3rem;
+    }
+	body.presentation pluto-editor.fullscreen & .markdown li li {
+        font-size: 1.2rem;
+    }
+")
+
+# ╔═╡ b79d0c0b-6e75-4ba5-a4ac-a57348f2372f
+md"""
+- Loads the notebook process as external VSCode REPL
+  - using the `@connect_vscode` macro
+- Defines custom `@run` and `@enter` macros, which do the following:
+  - Parse the given expression to extract references to notebook variables
+  - Create a code string with a let block importing the notebook variables and running the given expression
+  - Send this to VSCode using the JSON RPC protocol
+""" |> apply_css("
+	body.presentation pluto-editor.fullscreen & ul {
+        margin: 0 0;
+    }
+	body.presentation pluto-editor.fullscreen & li p {
+        margin-bottom: 1rem;
+    }
+    body.presentation pluto-editor.fullscreen & p,
+	body.presentation pluto-editor.fullscreen & .markdown li {
+        font-size: 1.4rem;
+    }
+")
+
+# ╔═╡ 74956b5a-3f55-45ef-bb6b-447c0d2c0c0d
+md"""
+- Possible version mismatch of dependencies between notebook and package environment
+  - Add some warning in case different versions are seen in the two manifests
+- First call to `@frompackage` might be quite long, and logging does not appear in Pluto before macro is compiled
+  - Hope to fix this in Pluto PR
+- All code is re-loaded every time the macro is executed
+  - Attempt to integrate Revise.jl to only reload the full code if Revise fails
+- Still relies on internals of Base and Pluto
+""" |> apply_css("
+	body.presentation pluto-editor.fullscreen & ul {
+        margin: 0 0;
+    }
+	body.presentation pluto-editor.fullscreen & li p {
+        margin-bottom: .6rem;
+    }
+	body.presentation pluto-editor.fullscreen & .markdown li {
+        font-size: 1.3rem;
+    }
+	body.presentation pluto-editor.fullscreen & .markdown li li {
+        font-size: 1.2rem;
+    }
+")
+
+# ╔═╡ 79a455bc-c2db-495f-aab4-6f3930c4506e
+md"""
+- Debugging of Notebook code is inconvenient
+  - Future PR to address this is planned
+- The `@run`/`@enter` macros do not work when called from a `let` block
+  - Hacky idea to fix this for future PR
+- DebugAdapter.jl had breaking changes 2 weeks ago
+  - Current code will likely not work, fix to be assessed.
+""" |> apply_css("
+	body.presentation pluto-editor.fullscreen & ul {
+        margin: 0 0;
+    }
+	body.presentation pluto-editor.fullscreen & li p {
+        margin-bottom: 1.5rem;
+    }
+	body.presentation pluto-editor.fullscreen & .markdown li {
+        font-size: 1.5rem;
+    }
+	body.presentation pluto-editor.fullscreen & .markdown li li {
+        font-size: 1.4rem;
+    }
+")
+
+# ╔═╡ 7ba53792-6ea6-4535-abda-460f2b39f91d
+html"<h1>Thank You<br>Questions?</br>" |> apply_css("
+body.presentation & {
+	text-align: center;
+}
 ")
 
 # ╔═╡ 63fa6496-fe18-4ec4-9f4a-5d6602ec094c
@@ -410,11 +698,15 @@ Cell defining the default style inside presentation mode
 		zoom: var(--zoom-level, 1);
 	}
 	body.presentation pluto-editor.fullscreen h1 {
-        font-size: 2.5em;
+        font-size: 2.5rem;
     }
 	body.presentation pluto-editor.fullscreen h2 {
-        font-size: 2.3em;
+        font-size: 2.3rem;
     }
+	body.presentation {
+    /* For some reason this is needed to remove the scrollbar */
+		overflow: hidden;
+	}
 </style>
 """)
 
@@ -425,12 +717,14 @@ Cell defining the default style inside presentation mode
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 HypertextLiteral = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
+MarkdownLiteral = "736d6165-7244-6769-4267-6b50796e6954"
 PlutoDevMacros = "a0499f29-c39b-4c5c-807c-88074221b949"
 PlutoExtras = "ed5d0301-4775-4676-b788-cf71e66ff8ed"
 PlutoVSCodeDebugger = "560812a8-17ff-4261-aab5-f8f600b273e2"
 
 [compat]
 HypertextLiteral = "~0.9.5"
+MarkdownLiteral = "~0.1.1"
 PlutoDevMacros = "~0.9.0"
 PlutoExtras = "~0.7.13"
 PlutoVSCodeDebugger = "~0.2.0"
@@ -442,7 +736,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.4"
 manifest_format = "2.0"
-project_hash = "e9eb2ebeee888a243df8127847890ff85e6cc563"
+project_hash = "a77222776ad0500c53547c687627ff674222bdc4"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -472,10 +766,21 @@ git-tree-sha1 = "b10d0b65641d57b8b4d5e234446582de5047050d"
 uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
 version = "0.11.5"
 
+[[deps.CommonMark]]
+deps = ["Crayons", "JSON", "PrecompileTools", "URIs"]
+git-tree-sha1 = "532c4185d3c9037c0237546d817858b23cf9e071"
+uuid = "a80b9123-70ca-4bc0-993e-6e3bcb318db6"
+version = "0.8.12"
+
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 version = "1.1.1+0"
+
+[[deps.Crayons]]
+git-tree-sha1 = "249fe38abf76d48563e2f4556bebd215aa317e15"
+uuid = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
+version = "4.1.1"
 
 [[deps.Dates]]
 deps = ["Printf"]
@@ -583,6 +888,12 @@ version = "0.5.13"
 [[deps.Markdown]]
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
+
+[[deps.MarkdownLiteral]]
+deps = ["CommonMark", "HypertextLiteral"]
+git-tree-sha1 = "0d3fa2dd374934b62ee16a4721fe68c418b92899"
+uuid = "736d6165-7244-6769-4267-6b50796e6954"
+version = "0.1.1"
 
 [[deps.MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -750,18 +1061,30 @@ version = "17.4.0+2"
 # ╠═67673993-85e7-46e2-ad71-fb0bf7c0dbec
 # ╟─b74207fb-0901-4897-8f75-c842f93e01c7
 # ╟─361f7679-127e-4bb3-a12e-5868785fc4f1
-# ╠═ba6f6e05-bcfa-47cf-92f7-ec548f48ef3b
+# ╟─ba6f6e05-bcfa-47cf-92f7-ec548f48ef3b
 # ╟─78c648d9-f2a3-48ec-851a-b58cb93a44aa
-# ╠═80876756-b4f3-48bf-894d-1669bf1dcbaa
-# ╠═468613ad-54ee-494c-af7c-536f9101a845
+# ╟─80876756-b4f3-48bf-894d-1669bf1dcbaa
+# ╟─468613ad-54ee-494c-af7c-536f9101a845
+# ╟─2a05d4a9-dd6b-4698-86f5-1a68e5a5db07
+# ╟─1dfb599b-63f1-4f3c-8aa1-1dd60c597a77
+# ╟─2980db17-58ae-4780-9a56-1283a7991b23
+# ╟─29fbed9d-f99b-4765-a914-a3d7dd89e44b
+# ╟─903c695a-22db-4c73-8a74-8218e80a2bb4
+# ╟─c32e3918-364f-47b8-b857-a2cd5a20fb7f
+# ╟─f399643a-157e-4096-b3f5-74898bd94015
+# ╟─016a037f-2e8e-4390-8800-59e08e3bfb38
+# ╟─26e3c22f-68d2-4230-8952-2f548ce94fd4
+# ╟─40baba4f-c2b4-41d8-92ea-bca5eeb05cbc
+# ╟─54547c75-6423-4955-a43c-c5c523c643db
+# ╟─1604cb84-3023-4d5c-a24c-ff3f03375214
+# ╟─b79d0c0b-6e75-4ba5-a4ac-a57348f2372f
 # ╟─6200d8c1-5f84-47bd-b859-143fac60cd16
-# ╟─cfe2d6f7-9025-4ff7-a7d1-4c65d0e57e8a
-# ╠═1a5a5e07-9d4e-43ff-89d2-6c86f248a123
-# ╠═4ba4ee89-e7e5-4f94-845e-99d29ffdff2d
-# ╠═eeea367f-df6c-4d32-8764-97eaf1d2439d
-# ╠═e4895912-285b-433d-b58e-92a326bc963b
-# ╟─720ea93f-c1d5-4243-980c-381e4eeca461
 # ╟─2b685321-4105-4ca6-9604-d9858c296318
+# ╟─fe4951fd-e7de-43f5-aeaf-9b4d21640ed0
+# ╟─74956b5a-3f55-45ef-bb6b-447c0d2c0c0d
+# ╟─5f2e8a98-5911-4070-b0eb-43591f406891
+# ╟─79a455bc-c2db-495f-aab4-6f3930c4506e
+# ╟─7ba53792-6ea6-4535-abda-460f2b39f91d
 # ╟─41e6fb64-27a0-4054-ac56-6837d835aaf0
 # ╟─4c9b2590-3c49-11ef-073e-dff4579d7767
 # ╠═6fce800f-f375-414e-abee-ee02baf582a2

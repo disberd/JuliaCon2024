@@ -1,10 +1,11 @@
 ### A Pluto.jl notebook ###
 # v0.19.43
 
-#> custom_attrs = ["hide-enabled"]
-
 using Markdown
 using InteractiveUtils
+
+# ╔═╡ 7cdc36a5-ce59-4afa-92e9-7411ca69a4f7
+using PlutoDevMacros
 
 # ╔═╡ b19a1ce3-ad9f-495a-80a7-f595f3ad4f9e
 # ╠═╡ skip_as_script = true
@@ -14,8 +15,31 @@ begin
 	using PlutoExtras
 	using PlutoExtras.StructBondModule
 	using PlutoPlotly
+	using HypertextLiteral
 end
   ╠═╡ =#
+
+# ╔═╡ 39457bfb-217c-41be-aa03-12700390ecd0
+md"""
+# Antenna Concept
+"""
+
+# ╔═╡ f2b09d98-a0ea-4e99-bc24-ccf56f82f20f
+#=╠═╡
+let
+	img = Resource("https://upload.wikimedia.org/wikipedia/commons/4/4a/Phased_array_animation_with_arrow_10frames_371x400px_100ms.gif")
+	txt = md"This notebook/package will implement some basic functionality to model a simple linear phased-array antenna:"
+	@htl("""
+		$txt
+		<div style='display: flex; justify-content: center;'>$img</div>
+	""")
+end
+  ╠═╡ =#
+
+# ╔═╡ 39f97e69-8677-46d2-8ea0-80ea62770d1e
+md"""
+# Struct Definition
+"""
 
 # ╔═╡ c3b7788b-427a-4315-ab7d-993794251175
 @kwdef struct LinearArray
@@ -64,29 +88,58 @@ end
   ╠═╡ =#
 
 # ╔═╡ 0017d7da-d5a8-4ca5-83c9-fce41bddcb3b
+# ╠═╡ custom_attrs = ["toc-hidden"]
 md"""
 # Misc
 """
+
+# ╔═╡ de07cd53-762d-4d1e-852f-bf60ccfb86d6
+#=╠═╡
+# This simplifies applying custom css to cell outputs using the emtion JS library
+function apply_css(css; class = nothing)
+	to_js(x) = HypertextLiteral.JavaScript(x)
+	function apply(item)
+		content = @htl("
+			<div class='$class'>
+				$item
+			</div>
+		")
+		isnothing(css) && return content
+		@htl("""
+			$content
+			<script>
+				const { css } = await import("https://esm.sh/@emotion/css")
+				const item = currentScript.previousElementSibling
+				const className = css`$(to_js(css))`
+				item.classList.add(className)
+			</script>
+		""")
+	end
+end
+  ╠═╡ =#
 
 # ╔═╡ b2e4f616-3ecd-46d3-b377-d85385d4b836
 md"""
 ## Packages
 """
 
-# ╔═╡ 7cdc36a5-ce59-4afa-92e9-7411ca69a4f7
-import PlutoDevMacros as PDM
-
 # ╔═╡ 009f49ab-d6cb-44f8-afdc-85c42bfa01b5
 md"""
 ## Bonds
 """
 
+# ╔═╡ e769942b-fcaa-46ca-b129-8ce142161d95
+#=╠═╡
+single_bonds = @BondsList "Plot Variables" begin
+	"Pointing Angle [°]" = @bind θ₀ Slider(-90:90; default=0,show_value=true)
+end
+  ╠═╡ =#
+
 # ╔═╡ 46bb08cb-7ac3-4b8a-9f66-ed043c78767c
 #=╠═╡
-bond = @bind params @NTBond "Parameters" begin
-	N = ("Number of Elements", Slider(10:100; show_value=true))
+bond = @bind params @NTBond "Antenna Parameters" begin
+	N = ("Number of Elements", Slider(10:30; show_value=true))
 	spacing = ("Elements Spacing [ͅλ]", Slider(range(0.5, 2.5; step=0.05); show_value=true))
-	θ₀ = ("Pointing Angle [°]", Slider(-90:90; default=0,show_value=true))
 end;
   ╠═╡ =#
 
@@ -100,31 +153,37 @@ end
 
 # ╔═╡ 0d2c8fb1-07f1-4fb5-a55d-31e3ca75e2f5
 #=╠═╡
-let
-	(; θ₀) = params
-	plot_pattern(ant, θ₀)
-end
+plot_pattern(ant, θ₀)
   ╠═╡ =#
 
 # ╔═╡ 876ddb4e-4f40-4f73-afc8-29e5ee5dc964
 #=╠═╡
-BondTable([bond])
+BondTable([bond, single_bonds])
   ╠═╡ =#
 
 # ╔═╡ 4daec680-c779-4b48-9fe1-6f836f4bbb31
 #=╠═╡
-ExtendedTableOfContents(; hide_preamble=false)
+@htl("""
+$(ExtendedTableOfContents(;hide_preamble = false))
+<script>
+	const cell = currentScript.closest('pluto-cell')
+	cell.toggleAttribute('always-show',false)
+	cell.toggleAttribute('always-show-output',true)
+</script>
+""")
   ╠═╡ =#
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+HypertextLiteral = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
 PlutoDevMacros = "a0499f29-c39b-4c5c-807c-88074221b949"
 PlutoExtras = "ed5d0301-4775-4676-b788-cf71e66ff8ed"
 PlutoPlotly = "8e989ff0-3d88-8e9f-f020-2b208a939ff0"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
+HypertextLiteral = "~0.9.5"
 PlutoDevMacros = "~0.9.0"
 PlutoExtras = "~0.7.13"
 PlutoPlotly = "~0.4.6"
@@ -137,7 +196,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.4"
 manifest_format = "2.0"
-project_hash = "2112a4d0dd83782a2db28e7ffc3802a43eae90e2"
+project_hash = "444a56ec67959e74b32de0cdc82beda083e3e487"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -524,17 +583,22 @@ version = "17.4.0+2"
 """
 
 # ╔═╡ Cell order:
+# ╟─39457bfb-217c-41be-aa03-12700390ecd0
+# ╠═f2b09d98-a0ea-4e99-bc24-ccf56f82f20f
+# ╟─39f97e69-8677-46d2-8ea0-80ea62770d1e
 # ╠═c3b7788b-427a-4315-ab7d-993794251175
 # ╠═299a46e0-557f-4e7f-83dc-6124cc2ca422
 # ╠═a1f8d6f0-c18d-4bde-90d3-ca81b8a9f2b4
 # ╠═581794b6-a190-45f5-93fe-e7de6a15090f
 # ╠═8824bb11-1274-47eb-bdb2-65cf0972c228
 # ╠═0d2c8fb1-07f1-4fb5-a55d-31e3ca75e2f5
-# ╠═0017d7da-d5a8-4ca5-83c9-fce41bddcb3b
-# ╠═b2e4f616-3ecd-46d3-b377-d85385d4b836
+# ╟─0017d7da-d5a8-4ca5-83c9-fce41bddcb3b
+# ╠═de07cd53-762d-4d1e-852f-bf60ccfb86d6
+# ╟─b2e4f616-3ecd-46d3-b377-d85385d4b836
 # ╠═7cdc36a5-ce59-4afa-92e9-7411ca69a4f7
 # ╠═b19a1ce3-ad9f-495a-80a7-f595f3ad4f9e
-# ╠═009f49ab-d6cb-44f8-afdc-85c42bfa01b5
+# ╟─009f49ab-d6cb-44f8-afdc-85c42bfa01b5
+# ╠═e769942b-fcaa-46ca-b129-8ce142161d95
 # ╠═46bb08cb-7ac3-4b8a-9f66-ed043c78767c
 # ╠═876ddb4e-4f40-4f73-afc8-29e5ee5dc964
 # ╠═4daec680-c779-4b48-9fe1-6f836f4bbb31
